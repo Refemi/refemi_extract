@@ -10,7 +10,7 @@ import {
   const dataFolderPath = path.resolve(__dirname, 'data');
 
   const file = await fs.readFile(
-    path.resolve(dataFolderPath, 'Films et courts métrages.csv'),
+    path.resolve(dataFolderPath, 'Réseaux sociaux.csv'),
     'utf8'
   );
 
@@ -19,9 +19,8 @@ import {
   let refs: {
     nom: string;
     themes: number[];
-    auteur: string[];
-    date: string[];
-    pays: string[];
+    plateforme: string;
+    author: string
   }[] = [];
 
   let firstSkipped = false;
@@ -39,18 +38,11 @@ import {
       themes.push(await getOrCreateTheme(themeName));
     }
 
-    const authorNames = ref[2].split(/[-,]+/);
-
-    const dates = ref[3].split(/[-,]+/);
-
-    const countries = ref[4].split(/[,]+/);
-
     refs.push({
       nom: ref[0],
       themes,
-      auteur: authorNames,
-      date: dates,
-      pays: countries
+      plateforme: ref[2],
+      author: ref[4]
     });
   }
 
@@ -58,13 +50,12 @@ import {
     await client.query(
       `insert into "references" (
           reference_name,
-          reference_country_name,
           reference_category_id,
           reference_theme_id,
-          reference_date,
+          reference_field,
           reference_author
         ) values ($1, $2, $3, $4, $5, $6)`,
-      [ref.nom, ref.pays, 11, ref.themes, ref.date, ref.auteur]
+      [ref.nom, 18, ref.themes, ref.plateforme, ref.author]
     );
     const res = await client.query(
       'select id from "references" where reference_name like $1',

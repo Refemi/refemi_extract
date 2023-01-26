@@ -5,6 +5,8 @@ import {
   cleanLine,
   getOrCreateTheme,
   getOrCreateCategory,
+  getOrCreateAuthor,
+  getOrCreateCountry,
   client
 } from './common';
 
@@ -19,12 +21,12 @@ import {
   const _refs = file.replace(/\r/g, '').split('\n');
 
   let refs: {
-    nom: string;
+    title: string;
     themes: number[];
-    auteur: string;
+    authors: number[];
     date: string;
     genre: number;
-    pays: string;
+    countries: number[];
   }[] = [];
 
   let firstSkipped = false;
@@ -42,41 +44,74 @@ import {
       themes.push(await getOrCreateTheme(themeName));
     }
 
+    const authorNames = ref[2].split(',');
+    let authors: number[] = [];
+    for (let authorName of authorNames) {
+      authors.push(await getOrCreateAuthor(authorName));
+    }
+
+    const countryNames = ref[5].split(',');
+    let countries: number[] = [];
+    for (let countryName of countryNames) {
+      countries.push(await getOrCreateCountry(countryName));
+    }
+
     refs.push({
-      nom: ref[0],
+      title: ref[0],
       themes,
-      auteur: ref[2],
+      authors,
       date: ref[3],
       genre: await getOrCreateCategory(ref[4]),
-      pays: ref[5]
+      countries
     });
   }
 
   for (let ref of refs) {
     await client.query(
       `insert into "references" (
-          reference_name,
-          reference_country_name,
-          reference_category_id,
-          reference_theme_id,
+          title,
+          category_id,
           reference_date,
-          reference_author
-        ) values ($1, $2, $3, $4, $5, $6)`,
-      [ref.nom, ref.pays, ref.genre, ref.themes, ref.date, ref.auteur]
+          contributor_id,
+          themes_id,
+          authors_id,
+          countries_id
+        ) values ($1, $2, $3, $4, $5, $6, $7)`,
+      [ref.title, ref.genre, ref.date, 1, ref.themes, ref.authors, ref.countries]
     );
     const res = await client.query(
-      'select id from "references" where reference_name like $1',
-      [ref.nom]
+      'select id from "references" where title like $1',
+      [ref.title]
     );
     const refId = res.rows[0].id;
 
     for (let themeId of ref.themes) {
       await client.query(
-        `insert into reference_themes (
-            reference_theme_reference_id,
-            reference_theme_id
+        `insert into references_themes (
+            reference_id,
+            theme_id
           ) values ($1, $2)`,
         [refId, themeId]
+      );
+    }
+
+    for (let authorId of ref.authors) {
+      await client.query(
+        `insert into references_authors (
+            reference_id,
+            author_id
+          ) values ($1, $2)`,
+        [refId, authorId]
+      );
+    }
+
+    for (let countryId of ref.countries) {
+      await client.query(
+        `insert into references_countries (
+            reference_id,
+            country_id
+          ) values ($1, $2)`,
+        [refId, countryId]
       );
     }
   }
