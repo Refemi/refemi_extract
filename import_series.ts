@@ -6,7 +6,6 @@ import {
   getOrCreateTheme,
   getOrCreateAuthor,
   getOrCreateCountry,
-  getOrCreateField,
   client
 } from './common';
 
@@ -14,7 +13,7 @@ import {
   const dataFolderPath = path.resolve(__dirname, 'data');
 
   const file = await fs.readFile(
-    path.resolve(dataFolderPath, 'Livres et essais.csv'),
+    path.resolve(dataFolderPath, 'Séries.csv'),
     'utf8'
   );
 
@@ -25,8 +24,6 @@ import {
     themes: number[];
     authors: number[];
     dates: string[];
-    fields: number[];
-    category: number,
     countries: number[];
   }[] = [];
 
@@ -51,28 +48,20 @@ import {
       authors.push(await getOrCreateAuthor(authorName));
     }
 
-    const countryNames = ref[5].split(',');
+    const countryNames = ref[3].split(',');
     let countries: number[] = [];
     for (let countryName of countryNames) {
       countries.push(await getOrCreateCountry(countryName));
     }
 
-    const fieldNames = ref[4].split(',');
-    let fields: number[] = [];
-    for (let fieldName of fieldNames) {
-      fields.push(await getOrCreateField(fieldName));
-    }
-
-    const dates = ref[3].split(/[-,/]+/);
+    const dates = ref[4].split(/[-,/]+/);
 
     refs.push({
       title: ref[0],
       themes,
       authors,
       dates,
-      fields,
-      countries,
-      category: 1
+      countries
     });
   }
 
@@ -85,11 +74,9 @@ import {
           contributor_id,
           themes_id,
           authors_id,
-          countries_id,
-          is_active,
-          field
-        ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [ref.title, ref.category, ref.dates, 1, ref.themes, ref.authors, ref.countries, true, ref.fields]
+          countries_id
+        ) values ($1, $2, $3, $4, $5, $6, $7)`,
+      [ref.title, 10, ref.dates, 1, ref.themes, ref.authors, ref.countries]
     );
     const res = await client.query(
       'select id from "references" where title like $1',
@@ -126,16 +113,6 @@ import {
         [refId, countryId]
       );
     }
-    for (let fieldId of ref.fields) {
-      await client.query(
-        `insert into references_fields (
-            reference_id,
-            field_id
-          ) values ($1, $2)`,
-        [refId, fieldId]
-      );
-    }
   }
-
   console.log('Done.');
 })();
