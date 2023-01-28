@@ -1,9 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
+
 import {
   cleanLine,
   getOrCreateTheme,
   getOrCreateAuthor,
+  getOrCreateCountry,
   getOrCreateField,
   client
 } from './common';
@@ -12,7 +14,7 @@ import {
   const dataFolderPath = path.resolve(__dirname, 'data');
 
   const file = await fs.readFile(
-    path.resolve(dataFolderPath, 'Réseaux sociaux.csv'),
+    path.resolve(dataFolderPath, 'Livres et essais.csv'),
     'utf8'
   );
 
@@ -21,8 +23,10 @@ import {
   let refs: {
     title: string;
     themes: number[];
-    platforms: number[];
     authors: number[];
+    dates: string[];
+    fields: number[];
+    countries: number[];
   }[] = [];
 
   let firstSkipped = false;
@@ -40,23 +44,33 @@ import {
       themes.push(await getOrCreateTheme(themeName));
     }
 
-    const authorNames = ref[4].split(',');
+    const authorNames = ref[2].split(',');
     let authors: number[] = [];
     for (let authorName of authorNames) {
       authors.push(await getOrCreateAuthor(authorName));
     }
 
-    const platformNames = ref[2].split(',');
-    let platforms: number[] = [];
-    for (let platformName of platformNames) {
-      platforms.push(await getOrCreateField(platformName));
+    const countryNames = ref[5].split(',');
+    let countries: number[] = [];
+    for (let countryName of countryNames) {
+      countries.push(await getOrCreateCountry(countryName));
     }
+
+    const fieldNames = ref[4].split(',');
+    let fields: number[] = [];
+    for (let fieldName of fieldNames) {
+        fields.push(await getOrCreateField(fieldName));
+    }
+
+    const dates = ref[3].split(/[-,/]+/);
 
     refs.push({
       title: ref[0],
       themes,
-      platforms,
-      authors
+      authors,
+      dates,
+      fields,
+      countries,
     });
   }
 
@@ -65,13 +79,13 @@ import {
       `insert into "references" (
           title,
           category_id,
-          themes_id,
-          field,
-          authors_id,
+          reference_date,
           contributor_id,
-          is_active
+          themes_id,
+          authors_id,
+          countries_id
         ) values ($1, $2, $3, $4, $5, $6, $7)`,
-      [ref.title, 18, ref.themes, ref.platforms, ref.authors, 1, true]
+      [ref.title, 2, ref.dates, 1, ref.themes, ref.authors, ref.countries]
     );
     const res = await client.query(
       'select id from "references" where title like $1',
@@ -99,15 +113,25 @@ import {
       );
     }
 
-    for (let fieldId of ref.platforms) {
+    for (let countryId of ref.countries) {
       await client.query(
-        `insert into references_fields (
+        `insert into references_countries (
             reference_id,
-            field_id
+            country_id
           ) values ($1, $2)`,
-        [refId, fieldId]
+        [refId, countryId]
       );
     }
+
+    for (let fieldId of ref.fields) {
+        await client.query(
+          `insert into references_fields (
+              reference_id,
+              field_id
+            ) values ($1, $2)`,
+          [refId, fieldId]
+        );
+      }
   }
   console.log('Done.');
 })();

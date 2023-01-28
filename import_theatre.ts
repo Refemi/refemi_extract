@@ -4,7 +4,6 @@ import path from 'path';
 import {
   cleanLine,
   getOrCreateTheme,
-  getOrCreateCategory,
   getOrCreateAuthor,
   getOrCreateCountry,
   client
@@ -24,8 +23,7 @@ import {
     title: string;
     themes: number[];
     authors: number[];
-    date: string;
-    genre: number;
+    dates: string[];
     countries: number[];
   }[] = [];
 
@@ -56,12 +54,13 @@ import {
       countries.push(await getOrCreateCountry(countryName));
     }
 
+    const dates = ref[3].split(/[-,/]+/);
+
     refs.push({
       title: ref[0],
       themes,
       authors,
-      date: ref[3],
-      genre: await getOrCreateCategory(ref[4]),
+      dates,
       countries
     });
   }
@@ -77,7 +76,7 @@ import {
           authors_id,
           countries_id
         ) values ($1, $2, $3, $4, $5, $6, $7)`,
-      [ref.title, ref.genre, ref.date, 1, ref.themes, ref.authors, ref.countries]
+      [ref.title, 7, ref.dates, 1, ref.themes, ref.authors, ref.countries]
     );
     const res = await client.query(
       'select id from "references" where title like $1',

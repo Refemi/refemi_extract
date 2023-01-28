@@ -55,7 +55,6 @@ import {
 
     const dates = ref[3].split(/[-,]+/);
 
-
     refs.push({
       title: ref[0],
       themes,
@@ -73,9 +72,10 @@ import {
           category_id,
           themes_id,
           reference_date,
-          authors_id
-        ) values ($1, $2, $3, $4, $5, $6)`,
-      [ref.title, ref.countries, 11, ref.themes, ref.date, ref.authors]
+          authors_id,
+          contributor_id
+        ) values ($1, $2, $3, $4, $5, $6, $7)`,
+      [ref.title, ref.countries, 11, ref.themes, ref.date, ref.authors, 1]
     );
     const res = await client.query(
       'select id from "references" where title like $1',
