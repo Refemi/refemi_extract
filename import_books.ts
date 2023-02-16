@@ -87,9 +87,10 @@ import {
           authors_id,
           countries_id,
           is_active,
-          field
-        ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [ref.title, ref.category, ref.dates, 1, ref.themes, ref.authors, ref.countries, true, ref.fields]
+          field,
+          is_validated,
+        ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+      [ref.title, ref.category, ref.dates, 2, ref.themes, ref.authors, ref.countries, true, ref.fields, true]
     );
     const res = await client.query(
       'select id from "references" where title like $1',
