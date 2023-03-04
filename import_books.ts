@@ -72,7 +72,7 @@ import {
       dates,
       fields,
       countries,
-      category: 1
+      category: 362
     });
   }
 
@@ -87,8 +87,8 @@ import {
           authors_id,
           countries_id,
           is_active,
-          field,
-          is_validated,
+          fields_id,
+          is_validated
         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [ref.title, ref.category, ref.dates, 2, ref.themes, ref.authors, ref.countries, true, ref.fields, true]
     );
@@ -129,7 +129,7 @@ import {
     }
     for (let fieldId of ref.fields) {
       await client.query(
-        `insert into references_fields (
+        `insert into references_field (
             reference_id,
             field_id
           ) values ($1, $2)`,
