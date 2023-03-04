@@ -5,13 +5,13 @@
   "main": "script.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "run-biographies-script": "npx ts-node ./import_biographies.ts",
-    "run-books-script": "npx ts-node ./import_books.ts",
-    "run-documentary-script": "npx ts-node ./import_documentaire.ts",
-    "run-film-script": "npx ts-node ./import_film.ts",
-    "run-series-script": "npx ts-node ./import_series.ts",
-    "run-social-script": "npx ts-node ./import_social.ts",
-    "run-theatre-script": "npx ts-node ./import_theatre.ts"
+    "biographies-script": "npx ts-node ./import_biographies.ts",
+    "books-script": "npx ts-node ./import_books.ts",
+    "documentary-script": "npx ts-node ./import_documentaire.ts",
+    "film-script": "npx ts-node ./import_film.ts",
+    "series-script": "npx ts-node ./import_series.ts",
+    "social-script": "npx ts-node ./import_social.ts",
+    "theatre-script": "npx ts-node ./import_theatre.ts"
   },
   "author": "",
   "license": "ISC",
