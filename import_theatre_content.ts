@@ -47,12 +47,12 @@ import {
             return '';
     })
 
-    client.query('begin');
-    const res = await client.query(
-        `INSERT INTO "contents" (about_author, about_reference, reference_id, to_go_further, synopsis) VALUES ($1, $2, $3, $4, $5)`, [formattedRef[8], formattedRef[7], refId, formattedRef[9], formattedRef[6]]
-    )
-    client.query('commit');
-
+    // client.query('begin');
+    // const res = await client.query(
+    //     `INSERT INTO "contents" (about_author, about_reference, reference_id, to_go_further, synopsis) VALUES ($1, $2, $3, $4, $5)`, [formattedRef[8], formattedRef[7], refId, formattedRef[9], formattedRef[6]]
+    // )
+    // client.query('commit');
+console.log(refId)
 }
     console.log('Done')
     process.exit(1)
