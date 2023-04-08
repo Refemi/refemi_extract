@@ -2,7 +2,6 @@ import fs from 'fs/promises';
 import path from 'path';
 
 import {
-    getReferenceByName,
     client,
     getReferenceByNameForBooks
 } from './common';
@@ -23,7 +22,7 @@ import {
         return ref.trim()
     })
 
-    const refTitle = ref[0]
+    const refTitle = ref[0].replace("# ", "")
     const refId: number = await getReferenceByNameForBooks(refTitle)
     const formattedRef = ref.map((field) => {
         if(field != null)
